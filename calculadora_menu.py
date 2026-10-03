@@ -1,43 +1,43 @@
-def mostrar_menu():
-    print("\n==============================")
-    print("   🧮 CALCULADORA DE SARAY   ")
-    print("==============================")
-    print("1. Sumar (+)")
-    print("2. Restar (-)")
-    print("3. Multiplicar (×)")
-    print("4. Dividir (÷)")
-    print("5. Salir")
+import os
+
+# Un único color turquesa/ciano brillante
+COLOR = "\033[1;36m"
+RESET = "\033[0m"
+
+def sumar(a, b): return a + b
+def restar(a, b): return a - b
+def multiplicar(a, b): return a * b
+def dividir(a, b): return a / b if b != 0 else "Error: División por cero"
 
 while True:
-    mostrar_menu()
-    opcion = input("\nElige una opción (1-5): ")
+    print(f"\n{COLOR}┌────────────────────────────────────────┐")
+    print(f"│        🧮 CALCULADORA DE SARAY         │")
+    print(f"├────────────────────────────────────────┤")
+    print(f"│  1. Sumar (+)                          │")
+    print(f"│  2. Restar (-)                         │")
+    print(f"│  3. Multiplicar (×)                    │")
+    print(f"│  4. Dividir (÷)                        │")
+    print(f"│  5. Salir                              │")
+    print(f"└────────────────────────────────────────┘{RESET}")
 
-    if opcion == '5':
-        print("¡Saliendo de la calculadora. Sigue practicando, Saray!")
+    opcion = input(f"\n{COLOR}Elige una opción (1-5): {RESET}")
+
+    if opcion == "5":
+        print(f"\n{COLOR}¡Hasta luego, Saray! ✨{RESET}\n")
         break
 
-    if opcion in ('1', '2', '3', '4'):
+    if opcion in ["1", "2", "3", "4"]:
         try:
-            num1 = float(input("Ingresa el primer número: "))
-            num2 = float(input("Ingresa el segundo número: "))
-        except ValueError:
-            print("❌ Error: Por favor ingresa solo números válidos.")
-            continue
+            num1 = float(input(f"{COLOR}Ingresa el primer número: {RESET}"))
+            num2 = float(input(f"{COLOR}Ingresa el segundo número: {RESET}"))
 
-        if opcion == '1':
-            resultado = num1 + num2
-            print(f"✨ Resultado: {num1} + {num2} = {resultado}")
-        elif opcion == '2':
-            resultado = num1 - num2
-            print(f"✨ Resultado: {num1} - {num2} = {resultado}")
-        elif opcion == '3':
-            resultado = num1 * num2
-            print(f"✨ Resultado: {num1} × {num2} = {resultado}")
-        elif opcion == '4':
-            if num2 == 0:
-                print("❌ Error: No se puede dividir entre cero.")
-            else:
-                resultado = num1 / num2
-                print(f"✨ Resultado: {num1} ÷ {num2} = {resultado}")
+            if opcion == "1": res, op = sumar(num1, num2), "+"
+            elif opcion == "2": res, op = restar(num1, num2), "-"
+            elif opcion == "3": res, op = multiplicar(num1, num2), "×"
+            elif opcion == "4": res, op = dividir(num1, num2), "÷"
+
+            print(f"\n{COLOR}▶ Resultado: {num1} {op} {num2} = {res}{RESET}")
+        except ValueError:
+            print(f"\n{COLOR}⚠️ Por favor ingresa un número válido.{RESET}")
     else:
-        print("❌ Opción no válida. Inténtalo de nuevo.")
+        print(f"\n{COLOR}⚠️ Opción no válida.{RESET}")
