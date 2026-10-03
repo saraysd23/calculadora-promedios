@@ -25,24 +25,23 @@
       width: 100%;
       max-width: 380px;
       height: 100vh;
-      max-height: 800px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 20px 18px 30px 18px;
+      padding: 12px 16px 20px 16px;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 10px;
+      padding-top: 6px;
     }
     .tabs {
       display: flex;
-      gap: 20px;
+      gap: 18px;
     }
     .tab {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -54,48 +53,66 @@
     }
     .menu-dots {
       color: #888888;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: bold;
       cursor: pointer;
     }
     .display-section {
       display: flex;
+      flex-direction: column;
       justify-content: flex-end;
-      align-items: center;
-      padding: 20px 10px;
+      align-items: flex-end;
+      padding: 10px 5px;
       margin-top: auto;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .display-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .display-wrapper::-webkit-scrollbar {
+      display: none;
     }
     #display {
       background: transparent;
       border: none;
       color: #ffffff;
-      font-size: 3.8rem;
+      font-size: 2.8rem;
       text-align: right;
       outline: none;
-      width: 100%;
+      width: auto;
+      min-width: 20px;
       font-weight: 400;
+      letter-spacing: 1px;
     }
     .cursor {
       display: inline-block;
       width: 3px;
-      height: 3.5rem;
+      height: 2.6rem;
       background-color: #f96b00;
       margin-left: 2px;
       border-radius: 2px;
+      flex-shrink: 0;
     }
     .keypad {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+      gap: 10px;
     }
     button {
-      height: 72px;
+      height: 60px;
       border: none;
-      border-radius: 22px;
+      border-radius: 18px;
       background-color: #222327;
       color: #ffffff;
-      font-size: 1.65rem;
+      font-size: 1.5rem;
       font-weight: 500;
       cursor: pointer;
       display: flex;
@@ -115,7 +132,7 @@
     .btn-equal {
       background-color: #f96b00;
       color: #ffffff;
-      font-size: 1.8rem;
+      font-size: 1.7rem;
     }
     .btn-equal:active {
       filter: brightness(1.15);
@@ -134,8 +151,10 @@
     </div>
 
     <div class="display-section">
-      <input type="text" id="display" value="0" readonly>
-      <span class="cursor"></span>
+      <div class="display-wrapper" id="displayWrapper">
+        <span id="display">0</span>
+        <span class="cursor"></span>
+      </div>
     </div>
 
     <div class="keypad">
@@ -164,7 +183,7 @@
       <button class="orange" onclick="appendOp('+')">+</button>
 
       <!-- Fila 5 -->
-      <button class="orange" style="font-size: 1.3rem;">⇄</button>
+      <button class="orange" style="font-size: 1.2rem;">⇄</button>
       <button onclick="appendNum('0')">0</button>
       <button onclick="appendNum('.')">.</button>
       <button class="btn-equal" onclick="calculate()">=</button>
@@ -173,43 +192,78 @@
 
   <script>
     let display = document.getElementById('display');
+    let displayWrapper = document.getElementById('displayWrapper');
+
+    function scrollToRight() {
+      setTimeout(() => {
+        displayWrapper.scrollLeft = displayWrapper.scrollWidth;
+      }, 10);
+    }
+
+    function adjustFontSize() {
+      let len = display.innerText.length;
+      if (len > 12) {
+        display.style.fontSize = '1.8rem';
+      } else if (len > 8) {
+        display.style.fontSize = '2.2rem';
+      } else {
+        display.style.fontSize = '2.8rem';
+      }
+    }
 
     function appendNum(num) {
-      if (display.value === '0' || display.value === 'Error') {
-        display.value = num;
+      if (display.innerText === '0' || display.innerText === 'Error') {
+        display.innerText = num;
       } else {
-        display.value += num;
+        display.innerText += num;
       }
+      adjustFontSize();
+      scrollToRight();
     }
 
     function appendOp(op) {
-      let lastChar = display.value.slice(-1);
-      if (['+', '-', '*', '/', '%'].includes(lastChar)) {
-        display.value = display.value.slice(0, -1) + op;
+      let text = display.innerText;
+      let lastChar = text.slice(-1);
+      let showSymbol = op === '*' ? '×' : op === '/' ? '÷' : op;
+      
+      if (['+', '-', '×', '÷', '%', '*'].includes(lastChar)) {
+        display.innerText = text.slice(0, -1) + showSymbol;
       } else {
-        display.value += op;
+        display.innerText += showSymbol;
       }
+      adjustFontSize();
+      scrollToRight();
     }
 
     function clearDisplay() {
-      display.value = '0';
+      display.innerText = '0';
+      adjustFontSize();
     }
 
     function deleteLast() {
-      if (display.value.length > 1) {
-        display.value = display.value.slice(0, -1);
+      let text = display.innerText;
+      if (text.length > 1) {
+        display.innerText = text.slice(0, -1);
       } else {
-        display.value = '0';
+        display.innerText = '0';
       }
+      adjustFontSize();
+      scrollToRight();
     }
 
     function calculate() {
       try {
-        let expression = display.value.replace(/×/g, '*').replace(/÷/g, '/');
-        display.value = eval(expression);
+        let rawExpression = display.innerText.replace(/×/g, '*').replace(/÷/g, '/');
+        let result = eval(rawExpression);
+        if (typeof result === 'number') {
+          result = Math.round(result * 100000000) / 100000000;
+        }
+        display.innerText = result.toString();
       } catch (e) {
-        display.value = 'Error';
+        display.innerText = 'Error';
       }
+      adjustFontSize();
+      scrollToRight();
     }
   </script>
 </body>
